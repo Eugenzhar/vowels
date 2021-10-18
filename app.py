@@ -5,5 +5,5 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "I'm is Developer for 100000$ !"
+    return "I'm is Developer for 1000000$ !"
 app.run()
