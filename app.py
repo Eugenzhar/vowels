@@ -5,6 +5,7 @@ from vsearch import search4letters
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def hello():
     return "I'm is Developer for 1000000$ !"
@@ -25,4 +26,8 @@ def do_search() -> str:
 def entry_page() ->'html':
     return render_template('entry.html', the_title='Welcome to search for letters on the web!')
 
-app.run(debug=True)
+# def log_request(req: 'flask_request', res: str) -> None:
+#     with open()
+
+if __name__ == '__main__':
+    app.run(debug=True)
