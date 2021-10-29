@@ -1,14 +1,19 @@
-# save this as app.py
+#
+#   vsearch4web.py
+#   тема из книги О,Рэйли
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, request, escape
 from vsearch import search4letters
 
 app = Flask(__name__)
 
 def log_request(req: 'flask_request', res: str) -> None:
     with open('vsearch.log', 'a') as log:
-        print(req, res, file=log)
-
+        # print(req.form, file=log, end='|')
+        # print(req.remote_addr, file=log, end='|')
+        # print(req.user_agent, file=log, end='|')
+        # print(res, file=log)
+        print(req.form, req.remote_addr, req.user_agent, res, file=log, sep='|') # sep разделяет значения чертой |
 
 @app.route("/")
 def hello():
@@ -32,9 +37,19 @@ def entry_page() ->'html':
     return render_template('entry.html', the_title='Welcome to search for letters on the web!')
 
 @app.route("/viewlog")
-def view_the_log() -> str:
+def view_the_log() -> 'HTML':
+    contents = []
     with open('vsearch.log') as log:
-        contents = log.read()
-    return contents
+        for line in log:
+            contents.append([])
+            for item in line.split('|'):
+                contents[-1].append(escape(item))    # список списков  [[],[],[]]
+    titles = ('Form Data', 'Remote_addr', 'User_agent', 'Results')
+    return render_template('viewlog.html',
+                           the_title='View Log',
+                           the_row_titles=titles,
+                           the_data=contents,)
+
+    return str(contents)
 if __name__ == '__main__':
     app.run(debug=True)
