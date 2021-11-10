@@ -4,23 +4,39 @@
 from flask import Flask
 from flask import render_template, request, escape
 from vsearch import search4letters
-
+import mysql.connector
 app = Flask(__name__)
 
 def log_request(req: 'flask_request', res: str) -> None:
-    with open('vsearch.log', 'a') as log:
-        # print(req.form, file=log, end='|')
-        # print(req.remote_addr, file=log, end='|')
-        # print(req.user_agent, file=log, end='|')
-        # print(res, file=log)
-        print(req.form, req.remote_addr, req.user_agent, res, file=log, sep='|') # sep разделяет значения чертой |
+    dbconfig = {'host': '127.0.0.1',
+                'user': 'vsearch',
+                'password': 'vsearchpasswd',
+                'database': 'vsearchlogDB',}
+    conn = mysql.connector.connect(**dbconfig)
+    cursor = conn.cursor()
+    # with UseDatabase(dbconfig) as cursor:
+
+    _SQL = """insert in to log
+    (phrase, letters, ip, browser_string, results)
+    values
+    (%s, %s, %s, %s, %s)"""
+    cursor.execute(_SQL, (req.form['phrase'],
+                         req.form['letters'],
+                         req.remote_addr,
+                         req.user_agent.browser,
+                         res,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
 
 @app.route("/")
 def hello():
     return "I'm is Developer for 1000000$ !"
 
 @app.route('/search4', methods=['GET','POST'])
-def do_search() -> str:
+def do_search() -> 'html':
     phrase = request.form['phrase']
     letters = request.form['letters']
     title = 'Here are your results: '
