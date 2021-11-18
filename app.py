@@ -4,14 +4,18 @@
 from flask import Flask
 from flask import render_template, request, escape
 from vsearch import search4letters
-import mysql.connector
+
 app = Flask(__name__)
 
 def log_request(req: 'flask_request', res: str) -> None:
     dbconfig = {'host': '127.0.0.1',
                 'user': 'vsearch',
                 'password': 'vsearchpasswd',
-                'database': 'vsearchlogDB',}
+                'database': 'vsearchlogDB',
+                'auth_plugin': 'mysql_native_password'}
+
+    import mysql.connector
+
     conn = mysql.connector.connect(**dbconfig)
     cursor = conn.cursor()
     # with UseDatabase(dbconfig) as cursor:
@@ -35,7 +39,7 @@ def log_request(req: 'flask_request', res: str) -> None:
 def hello():
     return "I'm is Developer for 1000000$ !"
 
-@app.route('/search4', methods=['GET','POST'])
+@app.route('/search4', methods=['POST'])
 def do_search() -> 'html':
     phrase = request.form['phrase']
     letters = request.form['letters']
